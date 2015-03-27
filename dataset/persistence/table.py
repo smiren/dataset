@@ -353,7 +353,7 @@ class Table(object):
                 break
             queries.append(self.table.select(whereclause=args, limit=qlimit,
                                              offset=qoffset, order_by=order_by))
-        return ResultIter((self.database.executable.execute(q) for q in queries))
+        return ResultIter((self.database.executable.execute(q) for q in queries), total_count=total_row_count)
 
     def __len__(self):
         """

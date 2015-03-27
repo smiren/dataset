@@ -31,11 +31,12 @@ class ResultIter(object):
     """ SQLAlchemy ResultProxies are not iterable to get a
     list of dictionaries. This is to wrap them. """
 
-    def __init__(self, result_proxies):
+    def __init__(self, result_proxies, total_count=None):
         if not isgenerator(result_proxies):
             result_proxies = iter((result_proxies, ))
         self.result_proxies = result_proxies
         self.count = 0
+        self.total_count = total_count
         self.rp = None
 
     def _next_rp(self):
