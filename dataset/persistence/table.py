@@ -294,7 +294,7 @@ class Table(object):
             return self.table.c[order_by].asc()
 
     def find(self, _limit=None, _offset=0, _step=5000,
-             order_by='id', **_filter):
+             order_by='id', with_total_count=False, **_filter):
         """
         Performs a simple search on the table. Simply pass keyword arguments as ``filter``.
         ::
@@ -333,6 +333,13 @@ class Table(object):
         count_query = alias(self.table.select(whereclause=args, limit=_limit, offset=_offset), name='count_query_alias').count()
         rp = self.database.executable.execute(count_query)
         total_row_count = rp.fetchone()[0]
+        # count all rows for query too
+        if with_total_count:
+            total_count_query = alias(self.table.select(whereclause=args), name='total_count_query_alias').count()
+            trp = self.database.executable.execute(total_count_query)
+            total_count = trp.fetchone()[0]
+        else:
+            total_count = total_row_count
 
         if _limit is None:
             _limit = total_row_count
@@ -353,7 +360,7 @@ class Table(object):
                 break
             queries.append(self.table.select(whereclause=args, limit=qlimit,
                                              offset=qoffset, order_by=order_by))
-        return ResultIter((self.database.executable.execute(q) for q in queries), total_count=total_row_count)
+        return ResultIter((self.database.executable.execute(q) for q in queries), total_count=total_count)
 
     def __len__(self):
         """
